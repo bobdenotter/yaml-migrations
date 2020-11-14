@@ -22,6 +22,6 @@ $command->option('c')
 
 $migrate = new Migrate($command['config']);
 
-$migrate->list();
+$migrate->process();
 
-echo 'done';
+echo '', PHP_EOL;;

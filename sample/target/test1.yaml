@@ -1,0 +1,6 @@
+foo:
+    - one
+    - bar
+    - qux
+bar: two
+qux: three

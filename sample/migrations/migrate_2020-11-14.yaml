@@ -1,7 +1,7 @@
 file: services.yaml
 since: 1.0.2
 
-add:
-    under: foo
-    content: bar
+#add:
+#    under: foo
+#    content: bar
 
