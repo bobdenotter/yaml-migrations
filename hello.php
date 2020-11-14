@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 require_once 'vendor/autoload.php';
 
 $hello_cmd = new Commando\Command();
@@ -13,15 +15,22 @@ $hello_cmd->option()
 $hello_cmd->option('t')
     ->aka('title')
     ->describedAs('When set, use this title to address the person')
-    ->must(function($title) {
-        $titles = array('Mister', 'Mr', 'Misses', 'Mrs', 'Miss', 'Ms');
-        return in_array($title, $titles);
+    ->must(function ($title) {
+        $titles = ['Mister', 'Mr', 'Misses', 'Mrs', 'Miss', 'Ms'];
+
+        return in_array($title, $titles, true);
     })
-    ->map(function($title) {
-        $titles = array('Mister' => 'Mr', 'Misses' => 'Mrs', 'Miss' => 'Ms');
-        if (array_key_exists($title, $titles))
+    ->map(function ($title) {
+        $titles = [
+            'Mister' => 'Mr',
+            'Misses' => 'Mrs',
+            'Miss' => 'Ms',
+        ];
+        if (array_key_exists($title, $titles)) {
             $title = $titles[$title];
-        return "$title. ";
+        }
+
+        return "${title}. ";
     });
 
 // Define a boolean flag "-c" aka "--capitalize"
@@ -34,13 +43,13 @@ $hello_cmd->option('c')
 // Define an incremental flag "-e" aka "--educate"
 $hello_cmd->option('e')
     ->aka('educate')
-    ->map(function($value) {
-        $postfix = array('', 'Jr', 'esq', 'PhD');
-        return $postfix[$value] === '' ? '' : " {$postfix[$value]}";
+    ->map(function ($value) {
+        $postfix = ['', 'Jr', 'esq', 'PhD'];
+
+        return '' === $postfix[$value] ? '' : " {$postfix[$value]}";
     })
     ->count(4);
 
 $name = $hello_cmd['capitalize'] ? ucwords($hello_cmd[0]) : $hello_cmd[0];
 
 echo "Hello {$hello_cmd['title']}$name{$hello_cmd['educate']}!", PHP_EOL;
-

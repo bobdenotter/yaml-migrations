@@ -1,10 +1,11 @@
 <?php
 
-use YamlMigrate\Migrate;
+declare(strict_types=1);
+
 use Commando\Command;
+use YamlMigrate\Migrate;
 
-require_once "vendor/autoload.php";
-
+require_once 'vendor/autoload.php';
 
 $command = new Commando\Command();
 
@@ -19,7 +20,8 @@ $command->option('c')
     ->require()
     ->describedAs('When set, use this configuration file for migrations');
 
-$migrate = new YamlMigrate\Migrate($command['config']);
+$migrate = new Migrate($command['config']);
 
+$migrate->list();
 
-echo "done";
+echo 'done';
