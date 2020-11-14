@@ -79,11 +79,11 @@ class Migrate
 
     private function doMigration(string $filename, array $data, array $migration): array
     {
-        $displayname = sprintf('%s/%s', basename(dirname($filename)), basename($filename));
-        echo "Migrating " . $displayname . ": ";
+        $displayname = sprintf('%s/%s', basename(\dirname($filename)), basename($filename));
+        echo 'Migrating '.$displayname.': ';
 
         if (\array_key_exists('add', $migration)) {
-            echo "Adding keys…";
+            echo 'Adding keys…';
             $data = $this->doMigrationAdd($data, $migration['add']);
         }
 
