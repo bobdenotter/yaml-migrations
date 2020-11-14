@@ -1,0 +1,28 @@
+{
+    "name": "bobdenotter/yaml-migrate",
+    "description": "A library to facilitate migrations for YAML configuration files",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Bob den Otter",
+            "email": "bob@twokings.nl"
+        }
+    ],
+    "require": {
+        "nategood/commando": "^0.4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "YamlMigrate\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "YamlMigrate\\Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "symplify/easy-coding-standard": "^8.3"
+    }
+}
