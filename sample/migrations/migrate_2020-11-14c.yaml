@@ -1,4 +1,4 @@
-file: services.yaml
+file: services_duplicate.yaml
 since: 1.0.2
 
 add:

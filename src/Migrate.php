@@ -63,32 +63,38 @@ class Migrate
 
     private function processFile(string $filename): void
     {
-        $migration = Yaml::parseFile($filename);
+        $migration = Yaml::parseFile($filename, Yaml::PARSE_CUSTOM_TAGS);
 
         $inputFilename = sprintf('%s/%s', $this->config['source'], $migration['file']);
         $outputFilename = sprintf('%s/%s', $this->config['target'], $migration['file']);
 
         $data = Yaml::parseFile($inputFilename, Yaml::PARSE_CUSTOM_TAGS);
 
-        $data = $this->doMigration($data, $migration);
+        $data = $this->doMigration($inputFilename, $data, $migration);
 
-        $output = Yaml::dump($data, 4, 4);
+        $output = Yaml::dump($data, 4, 4, Yaml::DUMP_NULL_AS_TILDE);
 
         FileWriter::writeFile($outputFilename, $output);
     }
 
-    private function doMigration(array $data, array $migration): array
+    private function doMigration(string $filename, array $data, array $migration): array
     {
+        $displayname = sprintf('%s/%s', basename(dirname($filename)), basename($filename));
+        echo "Migrating " . $displayname . ": ";
+
         if (\array_key_exists('add', $migration)) {
+            echo "Adding keys…";
             $data = $this->doMigrationAdd($data, $migration['add']);
         }
+
+        echo PHP_EOL;
 
         return $data;
     }
 
     private function doMigrationAdd(array $data, array $add): array
     {
-        return array_merge_recursive($data, $add);
+        return array_replace_recursive($data, $add);
     }
 
     private function getListToProcess()
@@ -100,7 +106,7 @@ class Migrate
         $list = [];
 
         foreach ($files as $file) {
-            $yaml = Yaml::parseFile($file->getRealPath());
+            $yaml = Yaml::parseFile($file->getRealPath(), Yaml::PARSE_CUSTOM_TAGS);
 
             if (Comparator::greaterThan($yaml['since'], $this->checkpoint)) {
                 $list[] = $file->getRealPath();

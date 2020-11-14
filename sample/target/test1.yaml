@@ -1,5 +1,4 @@
 foo:
-    - one
     - bar
     - qux
 bar: two
