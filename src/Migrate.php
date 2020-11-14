@@ -14,9 +14,7 @@ class Migrate
     /** @var array */
     private $config;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $checkpoint;
 
     public function __construct(string $configFilename)
@@ -34,8 +32,8 @@ class Migrate
             die("Config file ${configFilename} not found.");
         }
 
-        if (file_exists($this->config['migrations'] . '/checkpoint.txt')) {
-            $this->checkpoint = trim(file_get_contents($this->config['migrations'] . '/checkpoint.txt'));
+        if (file_exists($this->config['migrations'].'/checkpoint.txt')) {
+            $this->checkpoint = trim(file_get_contents($this->config['migrations'].'/checkpoint.txt'));
         }
     }
 
@@ -43,11 +41,10 @@ class Migrate
     {
         $list = $this->getListToProcess();
 
-        echo "Files to process: ", PHP_EOL;
+        echo 'Files to process: ', PHP_EOL;
         foreach ($list as $filename) {
-            $filename = str_replace(dirname(__DIR__), '…', $filename);
+            $filename = str_replace(\dirname(__DIR__), '…', $filename);
             echo $filename, PHP_EOL;
-
         }
     }
 
@@ -64,7 +61,7 @@ class Migrate
         }
     }
 
-    private function processFile(string $filename)
+    private function processFile(string $filename): void
     {
         $migration = Yaml::parseFile($filename);
 
@@ -77,14 +74,12 @@ class Migrate
 
         $output = Yaml::dump($data, 4, 4);
 
-
         FileWriter::writeFile($outputFilename, $output);
-
     }
 
     private function doMigration(array $data, array $migration): array
     {
-        if (array_key_exists('add', $migration)) {
+        if (\array_key_exists('add', $migration)) {
             $data = $this->doMigrationAdd($data, $migration['add']);
         }
 
@@ -93,9 +88,7 @@ class Migrate
 
     private function doMigrationAdd(array $data, array $add): array
     {
-        $data = array_merge_recursive($data, $add);
-
-        return $data;
+        return array_merge_recursive($data, $add);
     }
 
     private function getListToProcess()
@@ -115,6 +108,5 @@ class Migrate
         }
 
         return $list;
-
     }
 }
