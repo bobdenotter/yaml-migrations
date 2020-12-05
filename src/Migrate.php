@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace YamlMigrate;
 
+use Colors\Color;
 use Composer\Semver\Comparator;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
@@ -17,9 +18,16 @@ class Migrate
     /** @var string */
     private $checkpoint;
 
+    /** @var Color */
+    private $color;
+
+    /** @var bool */
+    private $verbose = false;
+
     public function __construct(string $configFilename)
     {
         $this->initialize($configFilename);
+        $this->initColor();
     }
 
     private function initialize(string $configFilename): void
@@ -56,12 +64,18 @@ class Migrate
     {
         $list = $this->getListToProcess();
 
+        $success = true;
+
         foreach ($list as $filename) {
-            $this->processFile($filename);
+            $success = $success && $this->processFile($filename);
+        }
+
+        if ($success) {
+
         }
     }
 
-    private function processFile(string $filename): void
+    private function processFile(string $filename): bool
     {
         $migration = Yaml::parseFile($filename, Yaml::PARSE_CUSTOM_TAGS);
 
@@ -75,12 +89,15 @@ class Migrate
         $output = Yaml::dump($data, 4, 4, Yaml::DUMP_NULL_AS_TILDE);
 
         FileWriter::writeFile($outputFilename, $output);
+
+        return true;
     }
 
     private function doMigration(string $filename, array $data, array $migration): array
     {
         $displayname = sprintf('%s/%s', basename(\dirname($filename)), basename($filename));
-        echo 'Migrating '.$displayname.': ';
+
+        $this->verboseOutput('Migrating ' . $displayname . ': ');
 
         if (\array_key_exists('add', $migration)) {
             echo 'Adding keys…';
@@ -114,5 +131,51 @@ class Migrate
         }
 
         return $list;
+    }
+
+    private function initColor()
+    {
+        $this->color = new Color();
+        $this->color->setUserStyles(
+            array(
+                'success' => array('white', 'bg_green', 'bold'),
+                'warning' => array('white', 'bg_red', 'bold'),
+                'important' => 'bold',
+            )
+        );
+    }
+
+    private function output(string $str, bool $newLine = true, string $style = null): void
+    {
+        $output = ($this->color)($str) . ($newLine ? "\n" : '');
+
+        if ($style) {
+            $output->apply($style);
+        }
+
+        echo $output;
+    }
+
+    private function verboseOutput(string $str, bool $newLine = true, string $style = null): void
+    {
+        if ($this->verbose) {
+            $this->output($str, $newLine, $style);
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVerbose(): bool
+    {
+        return $this->verbose;
+    }
+
+    /**
+     * @param bool $verbose
+     */
+    public function setVerbose(bool $verbose): void
+    {
+        $this->verbose = $verbose;
     }
 }

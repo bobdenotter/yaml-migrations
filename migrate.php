@@ -18,10 +18,25 @@ $command->option()
 $command->option('c')
     ->aka('config')
     ->require()
-    ->describedAs('When set, use this configuration file for migrations');
+    ->describedAs('Use this configuration file for migrations');
+
+$command->option('v')
+    ->aka('verbose')
+    ->describedAs('When set, produce more verbose output')
+    ->boolean();
 
 $migrate = new Migrate($command['config']);
 
-$migrate->process();
+dump($command['v']);
+$migrate->setVerbose($command['v']);
+
+/** @var \Commando\Option $argument */
+$argument = $command->getArguments()[0];
+
+if ($argument->getValue() == 'list') {
+    $migrate->list();
+} else if ($argument->getValue() == 'process') {
+    $migrate->process();
+}
 
 echo '', PHP_EOL;;

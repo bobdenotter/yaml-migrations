@@ -1,0 +1,7 @@
+file: noop.yaml
+since: 1.0.2
+
+add:
+    foo:
+        - bar
+
