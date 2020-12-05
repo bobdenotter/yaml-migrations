@@ -25,10 +25,15 @@ $command->option('v')
     ->describedAs('When set, produce more verbose output')
     ->boolean();
 
+$command->option('s')
+    ->aka('silent')
+    ->describedAs('When set, silence output')
+    ->boolean();
+
 $migrate = new Migrate($command['config']);
 
-dump($command['v']);
 $migrate->setVerbose($command['v']);
+$migrate->setSilent($command['s']);
 
 /** @var \Commando\Option $argument */
 $argument = $command->getArguments()[0];

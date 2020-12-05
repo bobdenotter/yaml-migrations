@@ -24,6 +24,11 @@ class Migrate
     /** @var bool */
     private $verbose = false;
 
+    /** @var bool */
+    private $silent = false;
+
+
+
     public function __construct(string $configFilename)
     {
         $this->initialize($configFilename);
@@ -45,24 +50,43 @@ class Migrate
         }
     }
 
-    public function list(): void
+    public function list(): array
     {
         $list = $this->getListToProcess();
 
-        echo 'Files to process: ', PHP_EOL;
+        $this->output('Files to process: ', true, 'important');
         foreach ($list as $filename) {
             $filename = str_replace(\dirname(__DIR__), '…', $filename);
-            echo $filename, PHP_EOL;
+            $this->output(' - ' . $filename);
         }
+
+        return $list;
     }
 
     public function diff(): void
     {
     }
 
-    public function process(): void
+    public function process(string $onlyFilename = null): void
     {
         $list = $this->getListToProcess();
+
+        $success = $this->processIterator($list, $onlyFilename);
+
+        if ($success) {
+
+        }
+    }
+
+    public function processIterator(array $list, string $onlyFilename = null): bool
+    {
+        if ($onlyFilename) {
+            if (! array_key_exists($onlyFilename, $list)) {
+                throw new \Exception("File '" . $onlyFilename. "' is not available in configured input folder.");
+            }
+            return $this->processFile($list[$onlyFilename]);
+
+        }
 
         $success = true;
 
@@ -70,9 +94,7 @@ class Migrate
             $success = $success && $this->processFile($filename);
         }
 
-        if ($success) {
-
-        }
+        return $success;
     }
 
     private function processFile(string $filename): bool
@@ -126,7 +148,7 @@ class Migrate
             $yaml = Yaml::parseFile($file->getRealPath(), Yaml::PARSE_CUSTOM_TAGS);
 
             if (Comparator::greaterThan($yaml['since'], $this->checkpoint)) {
-                $list[] = $file->getRealPath();
+                $list[$file->getFilename()] = $file->getRealPath();
             }
         }
 
@@ -147,13 +169,17 @@ class Migrate
 
     private function output(string $str, bool $newLine = true, string $style = null): void
     {
-        $output = ($this->color)($str) . ($newLine ? "\n" : '');
+        if ($this->silent) {
+            return;
+        }
+
+        $output = ($this->color)($str);
 
         if ($style) {
             $output->apply($style);
         }
 
-        echo $output;
+        echo $output . ($newLine ? "\n" : '');
     }
 
     private function verboseOutput(string $str, bool $newLine = true, string $style = null): void
@@ -177,5 +203,21 @@ class Migrate
     public function setVerbose(bool $verbose): void
     {
         $this->verbose = $verbose;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSilent(): bool
+    {
+        return $this->silent;
+    }
+
+    /**
+     * @param bool $silent
+     */
+    public function setSilent(bool $silent): void
+    {
+        $this->silent = $silent;
     }
 }
