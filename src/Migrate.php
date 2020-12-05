@@ -27,8 +27,6 @@ class Migrate
     /** @var bool */
     private $silent = false;
 
-
-
     public function __construct(string $configFilename)
     {
         $this->initialize($configFilename);
@@ -57,7 +55,7 @@ class Migrate
         $this->output('Files to process: ', true, 'important');
         foreach ($list as $filename) {
             $filename = str_replace(\dirname(__DIR__), '…', $filename);
-            $this->output(' - ' . $filename);
+            $this->output(' - '.$filename);
         }
 
         return $list;
@@ -67,25 +65,24 @@ class Migrate
     {
     }
 
-    public function process(string $onlyFilename = null): void
+    public function process(?string $onlyFilename = null): void
     {
         $list = $this->getListToProcess();
 
         $success = $this->processIterator($list, $onlyFilename);
 
         if ($success) {
-
         }
     }
 
-    public function processIterator(array $list, string $onlyFilename = null): bool
+    public function processIterator(array $list, ?string $onlyFilename = null): bool
     {
         if ($onlyFilename) {
-            if (! array_key_exists($onlyFilename, $list)) {
-                throw new \Exception("File '" . $onlyFilename. "' is not available in configured input folder.");
+            if (! \array_key_exists($onlyFilename, $list)) {
+                throw new \Exception("File '".$onlyFilename."' is not available in configured input folder.");
             }
-            return $this->processFile($list[$onlyFilename]);
 
+            return $this->processFile($list[$onlyFilename]);
         }
 
         $success = true;
@@ -119,7 +116,7 @@ class Migrate
     {
         $displayname = sprintf('%s/%s', basename(\dirname($filename)), basename($filename));
 
-        $this->verboseOutput('Migrating ' . $displayname . ': ');
+        $this->verboseOutput('Migrating '.$displayname.': ');
 
         if (\array_key_exists('add', $migration)) {
             echo 'Adding keys…';
@@ -155,19 +152,18 @@ class Migrate
         return $list;
     }
 
-    private function initColor()
+    private function initColor(): void
     {
         $this->color = new Color();
         $this->color->setUserStyles(
-            array(
-                'success' => array('white', 'bg_green', 'bold'),
-                'warning' => array('white', 'bg_red', 'bold'),
+            [
+                'success' => ['white', 'bg_green', 'bold'],
+                'warning' => ['white', 'bg_red', 'bold'],
                 'important' => 'bold',
-            )
-        );
+            ]);
     }
 
-    private function output(string $str, bool $newLine = true, string $style = null): void
+    private function output(string $str, bool $newLine = true, ?string $style = null): void
     {
         if ($this->silent) {
             return;
@@ -179,43 +175,31 @@ class Migrate
             $output->apply($style);
         }
 
-        echo $output . ($newLine ? "\n" : '');
+        echo $output.($newLine ? "\n" : '');
     }
 
-    private function verboseOutput(string $str, bool $newLine = true, string $style = null): void
+    private function verboseOutput(string $str, bool $newLine = true, ?string $style = null): void
     {
         if ($this->verbose) {
             $this->output($str, $newLine, $style);
         }
     }
 
-    /**
-     * @return bool
-     */
     public function isVerbose(): bool
     {
         return $this->verbose;
     }
 
-    /**
-     * @param bool $verbose
-     */
     public function setVerbose(bool $verbose): void
     {
         $this->verbose = $verbose;
     }
 
-    /**
-     * @return bool
-     */
     public function isSilent(): bool
     {
         return $this->silent;
     }
 
-    /**
-     * @param bool $silent
-     */
     public function setSilent(bool $silent): void
     {
         $this->silent = $silent;
