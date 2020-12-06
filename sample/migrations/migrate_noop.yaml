@@ -1,7 +1,8 @@
+# This one should be processed, but not change the file (because the key's present already)
+
 file: noop.yaml
 since: 1.0.2
 
 add:
-    foo:
-        - bar
+    foo: one
 

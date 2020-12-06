@@ -1,7 +1,9 @@
-file: services.yaml
+# This one should be skipped
+
+file: services_skip.yaml
 since: 1.0.0
 
 add:
-    under: foo
-    content: bar
+    under: lkjhgfd
+    content: lkjhgfds
 

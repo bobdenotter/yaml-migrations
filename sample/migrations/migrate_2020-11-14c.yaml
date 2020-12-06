@@ -1,5 +1,5 @@
 file: services_duplicate.yaml
-since: 1.0.2
+since: 1.0.3
 
 add:
     services:

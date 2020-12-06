@@ -20,6 +20,10 @@ $command->option('c')
     ->require()
     ->describedAs('Use this configuration file for migrations');
 
+$command->option('f')
+    ->aka('file')
+    ->describedAs('Run only on a specific file');
+
 $command->option('v')
     ->aka('verbose')
     ->describedAs('When set, produce more verbose output')
@@ -41,7 +45,7 @@ $argument = $command->getArguments()[0];
 if ($argument->getValue() == 'list') {
     $migrate->list();
 } else if ($argument->getValue() == 'process') {
-    $migrate->process();
+    $migrate->process($command['f']);
 }
 
 echo '', PHP_EOL;;

@@ -27,10 +27,16 @@ class Migrate
     /** @var bool */
     private $silent = false;
 
+    /**
+     * @var array
+     */
+    private $statistics = [];
+
     public function __construct(string $configFilename)
     {
         $this->initialize($configFilename);
         $this->initColor();
+        $this->initStatistics();
     }
 
     private function initialize(string $configFilename): void
@@ -72,6 +78,15 @@ class Migrate
         $success = $this->processIterator($list, $onlyFilename);
 
         if ($success) {
+            $output = sprintf("Processed %s files. Updated: %s, skipped: %s", count($list), $this->statistics['updated'], $this->statistics['skipped']);
+            $this->output($output, true, 'success');
+
+            // We only update the checkpoint if we process the list, not a single file
+            if (! $onlyFilename && $this->statistics['updated'] > 0) {
+                $this->output('Updating checkpoint to ' . $this->checkpoint, true);
+                FileWriter::writeFile($this->config['migrations'].'/checkpoint.txt', $this->checkpoint);
+            }
+
         }
     }
 
@@ -103,34 +118,47 @@ class Migrate
 
         $data = Yaml::parseFile($inputFilename, Yaml::PARSE_CUSTOM_TAGS);
 
-        $data = $this->doMigration($inputFilename, $data, $migration);
+        $migratedData = $this->doMigration($inputFilename, $data, $migration);
 
-        $output = Yaml::dump($data, 4, 4, Yaml::DUMP_NULL_AS_TILDE);
+        if ($migratedData) {
+            $output = Yaml::dump($migratedData, 4, 4, Yaml::DUMP_NULL_AS_TILDE);
+            FileWriter::writeFile($outputFilename, $output);
+            $this->statistics['updated']++;
+        }
 
-        FileWriter::writeFile($outputFilename, $output);
+        $this->setMaxCheckpoint($migration['since']);
 
         return true;
     }
 
-    private function doMigration(string $filename, array $data, array $migration): array
+    private function doMigration(string $filename, array $data, array $migration): ?array
     {
         $displayname = sprintf('%s/%s', basename(\dirname($filename)), basename($filename));
 
         $this->verboseOutput('Migrating '.$displayname.': ');
 
+        $result = null;
+
         if (\array_key_exists('add', $migration)) {
-            echo 'Adding keys…';
-            $data = $this->doMigrationAdd($data, $migration['add']);
+            $result = $this->doMigrationAdd($data, $migration);
         }
 
-        echo PHP_EOL;
-
-        return $data;
+        return $result;
     }
 
-    private function doMigrationAdd(array $data, array $add): array
+    private function doMigrationAdd(array $data, array $migration): ?array
     {
-        return array_replace_recursive($data, $add);
+        $migratedData = array_replace_recursive($data, $migration['add']);
+
+        if ($data === $migratedData) {
+            $this->verboseOutput(" - File '". $migration['file'] . "' does not need updating");
+            $this->statistics['skipped']++;
+            return null;
+        }
+
+        $this->verboseOutput(" - Adding " . count($migration['add']) . " keys.");
+
+        return $migratedData;
     }
 
     private function getListToProcess()
@@ -203,5 +231,20 @@ class Migrate
     public function setSilent(bool $silent): void
     {
         $this->silent = $silent;
+    }
+
+    private function initStatistics()
+    {
+        $this->statistics = [
+            'updated' => 0,
+            'skipped' => 0,
+        ];
+    }
+
+    private function setMaxCheckpoint(string $version): void
+    {
+        if (Comparator::greaterThan($version, $this->checkpoint)) {
+            $this->checkpoint = $version;
+        }
     }
 }

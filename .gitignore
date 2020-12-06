@@ -1,5 +1,7 @@
 /vendor/
 
+/sample/target/*
+!/sample/target/.gitkeep
 composer.phar
 
 
