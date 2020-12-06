@@ -6,6 +6,7 @@ namespace YamlMigrate;
 
 use Colors\Color;
 use Composer\Semver\Comparator;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 use Webimpress\SafeWriter\FileWriter;
@@ -65,10 +66,6 @@ class Migrate
         return $list;
     }
 
-    public function diff(): void
-    {
-    }
-
     public function process(?string $onlyFilename = null): void
     {
         $list = $this->getListToProcess();
@@ -113,13 +110,23 @@ class Migrate
         $inputFilename = sprintf('%s/%s', $this->config['source'], $migration['file']);
         $outputFilename = sprintf('%s/%s', $this->config['target'], $migration['file']);
 
-        $data = Yaml::parseFile($inputFilename, Yaml::PARSE_CUSTOM_TAGS);
+        if (is_readable($inputFilename)) {
+            $data = Yaml::parseFile($inputFilename, Yaml::PARSE_CUSTOM_TAGS);
+        } else {
+            $data = [];
+            dump($data);
+        }
 
         $migratedData = $this->doMigration($inputFilename, $data, $migration);
 
         if ($migratedData) {
             $output = Yaml::dump($migratedData, 4, 4, Yaml::DUMP_NULL_AS_TILDE);
+
+            $filesystem = new Filesystem();
+            $filesystem->mkdir(\dirname($outputFilename));
+
             FileWriter::writeFile($outputFilename, $output);
+            // FileWriter::writeFile($outputFilename . '.bak',  Yaml::dump($data, 4, 4, Yaml::DUMP_NULL_AS_TILDE));
             $this->statistics['updated']++;
         }
 
@@ -145,7 +152,7 @@ class Migrate
 
     private function doMigrationAdd(array $data, array $migration): ?array
     {
-        $migratedData = array_replace_recursive($data, $migration['add']);
+        $migratedData = ArrayMerge::merge($data, $migration['add']);
 
         if ($data === $migratedData) {
             $this->verboseOutput(" - File '".$migration['file']."' does not need updating");
@@ -163,7 +170,7 @@ class Migrate
     {
         $finder = new Finder();
 
-        $files = $finder->files()->in($this->config['migrations'])->name('*.yaml');
+        $files = $finder->files()->in($this->config['migrations'])->name('m-*.yaml');
 
         $list = [];
 
