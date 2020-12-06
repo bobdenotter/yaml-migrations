@@ -27,9 +27,7 @@ class Migrate
     /** @var bool */
     private $silent = false;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $statistics = [];
 
     public function __construct(string $configFilename)
@@ -78,15 +76,14 @@ class Migrate
         $success = $this->processIterator($list, $onlyFilename);
 
         if ($success) {
-            $output = sprintf("Processed %s files. Updated: %s, skipped: %s", count($list), $this->statistics['updated'], $this->statistics['skipped']);
+            $output = sprintf('Processed %s files. Updated: %s, skipped: %s', \count($list), $this->statistics['updated'], $this->statistics['skipped']);
             $this->output($output, true, 'success');
 
             // We only update the checkpoint if we process the list, not a single file
             if (! $onlyFilename && $this->statistics['updated'] > 0) {
-                $this->output('Updating checkpoint to ' . $this->checkpoint, true);
+                $this->output('Updating checkpoint to '.$this->checkpoint, true);
                 FileWriter::writeFile($this->config['migrations'].'/checkpoint.txt', $this->checkpoint);
             }
-
         }
     }
 
@@ -151,12 +148,13 @@ class Migrate
         $migratedData = array_replace_recursive($data, $migration['add']);
 
         if ($data === $migratedData) {
-            $this->verboseOutput(" - File '". $migration['file'] . "' does not need updating");
+            $this->verboseOutput(" - File '".$migration['file']."' does not need updating");
             $this->statistics['skipped']++;
+
             return null;
         }
 
-        $this->verboseOutput(" - Adding " . count($migration['add']) . " keys.");
+        $this->verboseOutput(' - Adding '.\count($migration['add']).' keys.');
 
         return $migratedData;
     }
@@ -233,7 +231,7 @@ class Migrate
         $this->silent = $silent;
     }
 
-    private function initStatistics()
+    private function initStatistics(): void
     {
         $this->statistics = [
             'updated' => 0,
