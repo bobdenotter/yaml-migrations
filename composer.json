@@ -1,5 +1,5 @@
 {
-    "name": "bobdenotter/yaml-migrate",
+    "name": "bobdenotter/yaml-migrations",
     "description": "A library to facilitate migrations for YAML configuration files",
     "type": "library",
     "license": "MIT",
