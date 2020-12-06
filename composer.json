@@ -30,5 +30,8 @@
     "require-dev": {
         "symplify/easy-coding-standard": "^8.3",
         "phpunit/phpunit": "^8.5"
-    }
+    },
+    "bin": [
+        "bin/yaml-migrate"
+    ]
 }
