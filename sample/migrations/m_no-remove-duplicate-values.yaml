@@ -1,0 +1,7 @@
+file: services_duplicated-values.yaml
+since: 1.0.2
+
+add:
+    services:
+        public: false
+        pompidom: tralala
