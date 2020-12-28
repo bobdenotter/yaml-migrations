@@ -73,7 +73,13 @@ class Migrate
         $success = $this->processIterator($list, $onlyFilename);
 
         if ($success) {
-            $output = sprintf('Processed %s files. Updated: %s, skipped: %s', \count($list), $this->statistics['updated'], $this->statistics['skipped']);
+            $output = sprintf(
+                'Processed %s files. Updated: %s, deleted: %s, skipped: %s.',
+                \count($list),
+                $this->statistics['updated'],
+                $this->statistics['deleted'],
+                $this->statistics['skipped']
+            );
             $this->output($output, true, 'success');
 
             // We only update the checkpoint if we process the list, not a single file
@@ -128,9 +134,9 @@ class Migrate
             FileWriter::writeFile($outputFilename, $output);
             // FileWriter::writeFile($outputFilename . '.bak',  Yaml::dump($data, 4, 4, Yaml::DUMP_NULL_AS_TILDE));
 
-            $this->verboseOutput(" - Written file '" . $outputFilename . "'.");
+            $this->verboseOutput(" - Written file '".$outputFilename."'.");
             $this->statistics['updated']++;
-        } else if (is_array($migratedData)) {
+        } elseif (\is_array($migratedData)) {
             // If the array is empty, we should _remove_ the target file
             $filesystem = new Filesystem();
             $filesystem->mkdir(\dirname($outputFilename));
@@ -155,7 +161,7 @@ class Migrate
 
         if (\array_key_exists('add', $migration)) {
             $result = $this->doMigrationAdd($data, $migration);
-        } else if (\array_key_exists('delete', $migration)) {
+        } elseif (\array_key_exists('delete', $migration)) {
             $result = $this->doMigrationDelete($migration);
         }
 
@@ -178,12 +184,10 @@ class Migrate
         return $migratedData;
     }
 
-
     private function doMigrationDelete(array $migration): ?array
     {
         return [];
     }
-
 
     private function getListToProcess()
     {
