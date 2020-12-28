@@ -48,8 +48,8 @@ class Migrate
             die("Config file ${configFilename} not found.");
         }
 
-        if (file_exists($this->config['migrations'].'/checkpoint.txt')) {
-            $this->checkpoint = trim(file_get_contents($this->config['migrations'].'/checkpoint.txt'));
+        if (file_exists($this->checkpointFilename())) {
+            $this->checkpoint = trim(file_get_contents($this->checkpointFilename()));
         }
     }
 
@@ -85,7 +85,7 @@ class Migrate
             // We only update the checkpoint if we process the list, not a single file
             if (! $onlyFilename && $this->statistics['updated'] > 0) {
                 $this->output('Updating checkpoint to '.$this->checkpoint, true);
-                FileWriter::writeFile($this->config['migrations'].'/checkpoint.txt', $this->checkpoint);
+                FileWriter::writeFile($this->checkpointFilename(), $this->checkpoint);
             }
         }
     }
@@ -268,6 +268,15 @@ class Migrate
             'skipped' => 0,
             'deleted' => 0,
         ];
+    }
+
+    private function checkpointFilename(): string
+    {
+        if ($this->config['checkpoint']) {
+            return $this->config['checkpoint'];
+        }
+
+        return $this->config['migrations'].'/checkpoint.txt';
     }
 
     private function setMaxCheckpoint(string $version): void
