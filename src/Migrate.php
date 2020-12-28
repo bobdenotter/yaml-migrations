@@ -114,12 +114,12 @@ class Migrate
             $data = Yaml::parseFile($inputFilename, Yaml::PARSE_CUSTOM_TAGS);
         } else {
             $data = [];
-            dump($data);
         }
 
         $migratedData = $this->doMigration($inputFilename, $data, $migration);
 
         if ($migratedData) {
+            // Regular data, write the file..
             $output = Yaml::dump($migratedData, 4, 4, Yaml::DUMP_NULL_AS_TILDE);
 
             $filesystem = new Filesystem();
@@ -127,7 +127,17 @@ class Migrate
 
             FileWriter::writeFile($outputFilename, $output);
             // FileWriter::writeFile($outputFilename . '.bak',  Yaml::dump($data, 4, 4, Yaml::DUMP_NULL_AS_TILDE));
+
+            $this->verboseOutput(" - Written file '" . $outputFilename . "'.");
             $this->statistics['updated']++;
+        } else if (is_array($migratedData)) {
+            // If the array is empty, we should _remove_ the target file
+            $filesystem = new Filesystem();
+            $filesystem->mkdir(\dirname($outputFilename));
+            $filesystem->remove($outputFilename);
+
+            $this->verboseOutput(" - Deleting file '".$migration['file']."'.");
+            $this->statistics['deleted']++;
         }
 
         $this->setMaxCheckpoint($migration['since']);
@@ -145,6 +155,8 @@ class Migrate
 
         if (\array_key_exists('add', $migration)) {
             $result = $this->doMigrationAdd($data, $migration);
+        } else if (\array_key_exists('delete', $migration)) {
+            $result = $this->doMigrationDelete($migration);
         }
 
         return $result;
@@ -166,11 +178,18 @@ class Migrate
         return $migratedData;
     }
 
+
+    private function doMigrationDelete(array $migration): ?array
+    {
+        return [];
+    }
+
+
     private function getListToProcess()
     {
         $finder = new Finder();
 
-        $files = $finder->files()->in($this->config['migrations'])->name('m-*.yaml');
+        $files = $finder->files()->in($this->config['migrations'])->name('m_*.yaml');
 
         $list = [];
 
@@ -243,6 +262,7 @@ class Migrate
         $this->statistics = [
             'updated' => 0,
             'skipped' => 0,
+            'deleted' => 0,
         ];
     }
 
