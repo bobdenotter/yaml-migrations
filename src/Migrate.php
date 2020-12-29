@@ -272,7 +272,7 @@ class Migrate
 
     private function checkpointFilename(): string
     {
-        if ($this->config['checkpoint']) {
+        if (array_key_exists('checkpoint', $this->config)) {
             return $this->config['checkpoint'];
         }
 

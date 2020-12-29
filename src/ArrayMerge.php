@@ -19,10 +19,15 @@ class ArrayMerge
         $result = [];
         foreach ($arrays as $array) {
             foreach ($array as $key => $value) {
-                // Don't add duplicates of objects here
-                if (\in_array($value, $result, true) && \is_object($value)) {
+                // Don't add duplicates of values here:
+                if (is_numeric(\array_search($value, $result, false))) {
+                    // echo "\n---\n";
+                    // dump($result);
+                    // dump($key);
+                    // dump($value);
                     continue;
                 }
+
                 // Renumber integer keys as array_merge_recursive() does
                 // unless $preserveIntegerKeys is set to TRUE. Note that PHP
                 // automatically converts array keys that are integer strings

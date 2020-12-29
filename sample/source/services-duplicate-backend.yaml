@@ -1,11 +1,7 @@
 
-services:
-
-    # menus
-    Bolt\Menu\BackendMenuBuilder:
-        arguments:
-            - foo
-            - "@knp_menu.factory"
-            - !tagged_iterator bolt.extension_backend_menu
-        tags:
-            - { name: knp_menu.menu_builder, method: createAdminMenu, alias: admin_menu } # The alias is what is used to retrieve the menu
+arguments:
+    - foo
+    - "@knp_menu.factory"
+    - !tagged_iterator bolt.extension_backend_menu
+tags:
+    - { name: knp_menu.menu_builder, method: createAdminMenu, alias: admin_menu } # The alias is what is used to retrieve the menu
