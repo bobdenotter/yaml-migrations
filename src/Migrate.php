@@ -117,7 +117,7 @@ class Migrate
         $outputFilename = sprintf('%s/%s', $this->config['target'], $migration['file']);
 
         if (is_readable($inputFilename)) {
-            $data = Yaml::parseFile($inputFilename, Yaml::PARSE_CUSTOM_TAGS);
+            $data = (array) Yaml::parseFile($inputFilename, Yaml::PARSE_CUSTOM_TAGS);
         } else {
             $data = [];
         }
@@ -272,7 +272,7 @@ class Migrate
 
     private function checkpointFilename(): string
     {
-        if (array_key_exists('checkpoint', $this->config)) {
+        if (\array_key_exists('checkpoint', $this->config)) {
             return $this->config['checkpoint'];
         }
 

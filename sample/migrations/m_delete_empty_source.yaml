@@ -1,0 +1,6 @@
+# This will delete an empty file, without breaking when parsing the empty input file
+
+file: delete_empty_source.yaml
+since: 1.0.2
+
+delete: ~

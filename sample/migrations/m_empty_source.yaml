@@ -1,0 +1,8 @@
+# This will add a key to an empty input file, without breaking when parsing the empty input file
+
+file: empty_source.yaml
+since: 1.0.2
+
+add:
+    foo: one
+
