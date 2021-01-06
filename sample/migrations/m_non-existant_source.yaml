@@ -1,0 +1,8 @@
+# This will add a key to a fie that doesn't exist, effectively creating a new file
+
+file: non-existant_source.yaml
+since: 1.0.2
+
+add:
+    foo: one
+

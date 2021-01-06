@@ -20,7 +20,7 @@ class ArrayMerge
         foreach ($arrays as $array) {
             foreach ($array as $key => $value) {
                 // Don't add duplicates of values here:
-                if (is_numeric(\array_search($value, $result, false))) {
+                if (is_numeric(array_search($value, $result, false))) {
                     // echo "\n---\n";
                     // dump($result);
                     // dump($key);

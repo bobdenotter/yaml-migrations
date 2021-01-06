@@ -1,0 +1,6 @@
+# This would delete a file, but the file doesn't exist, so it's basically a no-operation
+
+file: delete_non-existant_source.yaml
+since: 1.0.2
+
+delete: ~
