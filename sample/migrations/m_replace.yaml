@@ -1,0 +1,12 @@
+# This will replace an existing key
+
+file: replace.yaml
+since: 1.0.2
+
+add:
+  foo: newFooValue
+  bar:
+    one: two
+    three: four
+  qux:
+      five: [seven, [ eight, nine] ]
