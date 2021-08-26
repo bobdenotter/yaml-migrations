@@ -1,0 +1,13 @@
+# This one should be remove three keys (and underlying values) from the file:
+# `role_hierarchy`, `access_control`, and `foo/bar/qux`
+
+file: security_remove_key.yaml
+since: 1.0.2
+
+remove:
+  security:
+    role_hierarchy: ~
+    access_control: ~
+    foo:
+      bar:
+        qux: ~
