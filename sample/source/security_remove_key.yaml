@@ -1,0 +1,56 @@
+security:
+  role_hierarchy:
+    ROLE_ADMIN: [ROLE_EDITOR, ROLE_USER]
+    ROLE_EDITOR: [ROLE_USER]
+    ROLE_USER: []
+
+  foo:
+    bar:
+      qux: true
+      quuux: false
+    baz:
+      qux: true
+      quuux: false
+      foo:
+        bar:
+          qux: true
+          quuux: false
+
+  encoders:
+    Bolt\Entity\User: auto
+
+  providers:
+    database_users:
+      entity:
+        class: Bolt\Entity\User
+        property: username
+
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+
+    main:
+      pattern: ^/
+      anonymous: true
+      user_checker: Bolt\Security\UserChecker
+
+      guard:
+        authenticators:
+          - Bolt\Security\LoginFormAuthenticator
+
+      logout:
+        handler: Bolt\Security\LogoutListener
+        path: bolt_logout
+        target: bolt_login
+
+      remember_me:
+        secret: '%kernel.secret%'
+        lifetime: 2592000
+
+  access_control:
+    # this is a catch-all for the admin area
+    # additional security lives in the controllers
+    - { path: '^%bolt.backend_url%/(login|resetpassword)$', roles: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: '^%bolt.backend_url%', roles: ROLE_ADMIN }
+    - { path: '^/(%app_locales%)%bolt.backend_url%', roles: ROLE_ADMIN }
