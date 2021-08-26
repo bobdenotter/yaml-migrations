@@ -163,6 +163,8 @@ class Migrate
             $result = $this->doMigrationAdd($data, $migration);
         } elseif (\array_key_exists('delete', $migration)) {
             $result = $this->doMigrationDelete($migration);
+        } elseif(\array_key_exists('remove', $migration)) {
+            $result = $this->doMigrationRemove($data, $migration);
         }
 
         return $result;
@@ -180,6 +182,23 @@ class Migrate
         }
 
         $this->verboseOutput(' - Adding '.\count($migration['add']).' keys.');
+
+        return $migratedData;
+    }
+
+    private function doMigrationRemove(array $data, array $migration): ?array
+    {
+        $migratedData = $data;
+        ArrayMerge::removeArrayRecursively($migratedData, $migration['remove']);
+
+        if ($data === $migratedData) {
+            $this->verboseOutput(" - File '".$migration['file']."' does not need updating");
+            $this->statistics['skipped']++;
+
+            return null;
+        }
+
+        $this->verboseOutput(' - Removing '.\count($migration['remove']).' keys.');
 
         return $migratedData;
     }
