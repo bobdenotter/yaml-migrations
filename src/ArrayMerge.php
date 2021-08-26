@@ -50,4 +50,23 @@ class ArrayMerge
 
         return $result;
     }
+
+    public static function removeArrayRecursively(array &$origin, array $removables)
+    {
+        foreach ($origin as $key => $value) {
+            if (array_key_exists($key, $removables) && $removables[$key] === null) {
+                // Current key needs removing
+                unset($origin[$key]);
+            } else if (array_key_exists($key, $removables) && $removables[$key] !== null) {
+                // Check nested removables
+                self::removeArrayRecursively($origin[$key], $removables[$key]);
+            } else if (is_array($value) && array_key_exists($key, $removables)){
+                // If the current key value is an array, check it too.
+                self::removeArrayRecursively($value, $removables[$key]);
+            } else {
+                // Current key needs to be kept
+                continue;
+            }
+        }
+    }
 }
