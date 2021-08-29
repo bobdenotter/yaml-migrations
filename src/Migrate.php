@@ -70,6 +70,7 @@ class Migrate
     {
         $list = $this->getListToProcess();
 
+
         $success = $this->processIterator($list, $onlyFilename);
 
         if ($success) {
@@ -223,6 +224,8 @@ class Migrate
                 $list[$file->getFilename()] = $file->getRealPath();
             }
         }
+
+        ksort($list);
 
         return $list;
     }
