@@ -224,6 +224,8 @@ class Migrate
             }
         }
 
+        ksort($list);
+
         return $list;
     }
 
