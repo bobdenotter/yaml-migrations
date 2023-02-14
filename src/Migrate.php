@@ -45,7 +45,7 @@ class Migrate
         } elseif (file_exists(\dirname(__DIR__).'/'.$configFilename)) {
             $this->config = Yaml::parseFile(\dirname(__DIR__).'/'.$configFilename);
         } else {
-            die("Config file ${configFilename} not found.");
+            die("Config file {$configFilename} not found.");
         }
 
         if (file_exists($this->checkpointFilename())) {
