@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "nategood/commando": "^0.4.0",
+        "bobdenotter/commando": "^0.4 || ^1.0",
         "webimpress/safe-writer": "^2.1",
         "composer/semver": "^3.2",
         "symfony/yaml": "^5.1",
@@ -33,5 +33,10 @@
     },
     "bin": [
         "bin/yaml-migrate"
-    ]
+    ],
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
 }
